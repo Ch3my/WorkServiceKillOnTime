@@ -11,7 +11,6 @@ builder.Services.AddWindowsService(options =>
 LoggerProviderOptions.RegisterProviderOptions<
     EventLogSettings, EventLogLoggerProvider>(builder.Services);
 
-//builder.Services.AddSingleton<KillOnTime>();
 builder.Services.AddHostedService<WindowsBackgroundService>();
 
 IHost host = builder.Build();

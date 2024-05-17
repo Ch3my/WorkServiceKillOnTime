@@ -9,11 +9,14 @@ public sealed class WindowsBackgroundService : BackgroundService
     private readonly IConfiguration _configuration;
     private readonly ILogger<WindowsBackgroundService> _logger;
     private Timer? _timer;
+    EventLog eventLog = new EventLog();
 
     public WindowsBackgroundService(IConfiguration configuration, ILogger<WindowsBackgroundService> logger)
     {
         _configuration = configuration;
         _logger = logger;
+
+        eventLog.Source = "WorkServiceKillOnTime";
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -55,14 +58,6 @@ public sealed class WindowsBackgroundService : BackgroundService
 
     private void DoWork()
     {
-        // DEBUG Retrieve all running processes
-        // Process[] allProcesses = Process.GetProcesses();
-        // Log the names of all running processes
-        //foreach (Process process in allProcesses)
-        //{
-        //Console.WriteLine($"Process Name: {process.ProcessName}");
-        //}
-
         string[]? killTargets = _configuration.GetSection("KillTargets").Get<string[]>();
         if (killTargets == null || !killTargets.Any())
         {
@@ -77,6 +72,7 @@ public sealed class WindowsBackgroundService : BackgroundService
             {
                 process.Kill();
                 _logger.LogInformation($"Killed process: {target}");
+                eventLog.WriteEntry($"Killed process: {target} - ID {process.Id}");
             }
         }
     }
@@ -100,6 +96,7 @@ public sealed class WindowsBackgroundService : BackgroundService
         DateTime nextLaunchDateTime = now.Date.Add(launchTime);
 
         _logger.LogInformation($"LauchTime set to: {launchTime}");
+        eventLog.WriteEntry($"LauchTime set to: {launchTime}");
 
         if (now > nextLaunchDateTime)
         {

@@ -13,3 +13,6 @@ sc.exe delete "Kill on Time Service"
 
 ## Configurar
 Para configurar modificar appsettings.json con la hora en que quieres que se cierren los procesos y los nombres de los procesos. El nombre del Exe es sin .exe y es Case Sensitive
+
+## Logging
+hay dos log, uno hace log al console el otro hace log a EventViewer
